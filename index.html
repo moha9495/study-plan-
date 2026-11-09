@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f3a5f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Study Plan</title>
+<style>
+:root{
+  --bg:#f4f6fa;--card:#fff;--text:#1b2330;--muted:#6b7686;--line:#e3e8f0;
+  --brand:#1f3a5f;--accent:#2f6fed;--danger:#d64545;--ok:#2e9e5b;--warn:#d98a1a;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0f141c;--card:#18202c;--text:#e8edf5;--muted:#8d9aae;--line:#263145;--brand:#0f141c;--accent:#6b9bff}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;padding:calc(env(safe-area-inset-top) + 10px) 14px 0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{font-size:19px;margin:0;font-weight:650}
+.sub{font-size:12.5px;opacity:.8;margin-top:2px}
+.iconbtn{background:rgba(255,255,255,.14);border:0;color:#fff;border-radius:10px;width:40px;height:40px;font-size:20px}
+.tabs{display:flex;gap:4px;margin-top:10px}
+.tab{flex:1;background:none;border:0;color:#fff;opacity:.65;padding:10px 4px;font-size:14px;font-weight:600;border-bottom:3px solid transparent}
+.tab.on{opacity:1;border-color:#fff}
+main{padding:12px 12px 110px;max-width:720px;margin:0 auto}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:6px 12px;font-size:13.5px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.group{margin:14px 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.group h2{font-size:14px;margin:0;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.group small{color:var(--muted);font-size:12.5px}
+.group.now h2{color:var(--accent)}
+.group.bad h2{color:var(--danger)}
+.item{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c,#888);border-radius:12px;padding:10px 10px 10px 8px;margin-bottom:8px;display:flex;gap:8px;align-items:flex-start}
+.item.done{opacity:.55}
+.item.done .t{text-decoration:line-through}
+.chk{flex:none;width:32px;height:32px;border-radius:8px;border:2px solid var(--line);background:none;color:#fff;font-size:18px;line-height:1}
+.item.done .chk{background:var(--ok);border-color:var(--ok)}
+.body{flex:1;min-width:0}
+.t{font-weight:600;word-break:break-word}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;align-items:center;font-size:12.5px;color:var(--muted)}
+.tag{padding:2px 8px;border-radius:6px;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--text);font-weight:600}
+.type{padding:2px 8px;border-radius:6px;border:1px solid var(--line)}
+.type.hot{border-color:var(--warn);color:var(--warn);font-weight:600}
+.due{font-weight:600;color:var(--text)}
+.due.over{color:var(--danger)}
+.due.soon{color:var(--warn)}
+.setdate{border:1px dashed var(--accent);color:var(--accent);background:none;border-radius:6px;padding:2px 8px;font-size:12.5px}
+.note{margin-top:4px;font-size:13px;color:var(--muted);white-space:pre-wrap}
+.empty{text-align:center;color:var(--muted);padding:50px 20px}
+.empty b{display:block;color:var(--text);font-size:18px;margin-bottom:6px}
+.banner{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;font-size:14px}
+.banner button{margin-top:8px}
+.stats{display:flex;gap:8px;margin-bottom:12px}
+.stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.stat b{font-size:20px;display:block}
+.stat span{font-size:12px;color:var(--muted)}
+.stat.bad b{color:var(--danger)}
+.fab{position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom) + 18px);width:58px;height:58px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:30px;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:20}
+.sheet-bg.open{display:block}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:var(--card);border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 18px);max-width:720px;margin:0 auto}
+.sheet h3{margin:0 0 12px;font-size:18px}
+label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px;font-weight:600}
+input,select,textarea{width:100%;font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+textarea{min-height:120px}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.btns{display:flex;gap:10px;margin-top:16px}
+button.p,.banner button{flex:1;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px;font:inherit;font-weight:650}
+button.s{flex:1;background:none;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit}
+button.d{background:none;color:var(--danger);border:1px solid var(--danger);border-radius:10px;padding:12px;font:inherit}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.menu button.s{display:block;width:100%;margin-bottom:8px;text-align:left}
+code{background:var(--bg);padding:1px 5px;border-radius:5px;font-size:12.5px}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div>
+      <h1>Study Plan</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <button class="iconbtn" id="menuBtn" aria-label="Menu">⋮</button>
+  </div>
+  <div class="tabs">
+    <button class="tab" data-v="weeks">Weeks</button>
+    <button class="tab" data-v="subjects">Subjects</button>
+    <button class="tab" data-v="dates">Dates</button>
+  </div>
+</header>
+<main id="main"></main>
+<button class="fab" id="fab" aria-label="Add item">+</button>
+
+<div class="sheet-bg" id="bg"><div class="sheet" id="sheet"></div></div>
+
+<script>
+"use strict";
+const KEY = "studyplan.v1";
+const TYPES = ["lecture","assignment","quiz","test","project","lab","other"];
+const HOT = new Set(["assignment","quiz","test","project"]);
+const PALETTE = ["#2f6fed","#e0563a","#2e9e5b","#9b51e0","#d98a1a","#12a3b4","#d6457e","#6b7d2a"];
+
+let S = load() || {items:[], start:"", view:"weeks", filter:"all"};
+let deferredInstall = null;
+
+function load(){ try{ const raw = window.Android ? Android.load() : localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; } }
+function save(){ try{ const j = JSON.stringify(S); if(window.Android) Android.save(j); else localStorage.setItem(KEY, j); }catch(e){} }
+const $ = s => document.querySelector(s);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ---------- dates ---------- */
+function pd(s){ if(!s) return null; const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+function ds(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function today(){ const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function fmt(d){ return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}); }
+function fmtLong(d){ return d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}); }
+function weekRange(n){
+  const s = pd(S.start); if(!s || !n) return "";
+  const a = addDays(s,(n-1)*7), b = addDays(a,6);
+  return fmt(a)+" – "+fmt(b);
+}
+function currentWeek(){
+  const s = pd(S.start); if(!s) return null;
+  const w = Math.floor((today()-s)/(7*864e5))+1;
+  return w>=1 ? w : 0;
+}
+function daysUntil(dateStr){ return Math.round((pd(dateStr)-today())/864e5); }
+
+/* ---------- helpers ---------- */
+function colorFor(subject){
+  const names = [...new Set(S.items.map(i=>i.subject))].sort();
+  return PALETTE[Math.max(0,names.indexOf(subject))%PALETTE.length];
+}
+function subjects(){ return [...new Set(S.items.map(i=>i.subject))].sort(); }
+function inferType(t){
+  t = (t||"").toLowerCase();
+  if(/assign/.test(t)) return "assignment";
+  if(/quiz/.test(t)) return "quiz";
+  if(/test|exam|midterm|final/.test(t)) return "test";
+  if(/project|presentation|report/.test(t)) return "project";
+  if(/lab|tutorial/.test(t)) return "lab";
+  if(/lecture|chapter|topic|intro/.test(t)) return "lecture";
+  return "other";
+}
+function visible(){
+  return S.items.filter(i => S.filter==="all" || i.subject===S.filter);
+}
+function cmpItems(a,b){
+  return (a.date||"9999").localeCompare(b.date||"9999") || (a.week||99)-(b.week||99) || a.title.localeCompare(b.title);
+}
+
+/* ---------- rendering ---------- */
+function itemHTML(i, opts={}){
+  const c = colorFor(i.subject);
+  let when = "";
+  if(i.date){
+    const n = daysUntil(i.date);
+    let cls="", txt="";
+    if(i.done) txt = fmtLong(pd(i.date));
+    else if(n<0){ cls="over"; txt = fmtLong(pd(i.date))+" · "+(-n)+"d overdue"; }
+    else if(n===0){ cls="soon"; txt = "Today"; }
+    else if(n===1){ cls="soon"; txt = "Tomorrow"; }
+    else { cls = n<=3?"soon":""; txt = fmtLong(pd(i.date))+" · in "+n+"d"; }
+    when = `<span class="due ${cls}">📅 ${txt}</span>`;
+  } else if(HOT.has(i.type)){
+    when = `<button class="setdate" data-setdate="${i.id}">+ Set date</button>`;
+  }
+  const wk = (!opts.hideWeek && i.week) ? `<span>Week ${i.week}${weekRange(i.week)?" · "+weekRange(i.week):""}</span>` : "";
+  return `<div class="item ${i.done?"done":""}" style="--c:${c}" data-id="${i.id}">
+    <button class="chk" data-done="${i.id}" aria-label="Done">${i.done?"✓":""}</button>
+    <div class="body" data-edit="${i.id}">
+      <div class="t">${esc(i.title)}</div>
+      <div class="meta">
+        ${opts.hideSubject?"":`<span class="tag">${esc(i.subject)}</span>`}
+        <span class="type ${HOT.has(i.type)?"hot":""}">${i.type}</span>
+        ${when}${wk}
+      </div>
+      ${i.notes?`<div class="note">${esc(i.notes)}</div>`:""}
+    </div>
+  </div>`;
+}
+
+function chipsHTML(){
+  const subs = subjects();
+  if(subs.length<2) return "";
+  return `<div class="chips">
+    <button class="chip ${S.filter==="all"?"on":""}" data-filter="all">All</button>
+    ${subs.map(s=>`<button class="chip ${S.filter===s?"on":""}" data-filter="${esc(s)}">${esc(s)}</button>`).join("")}
+  </div>`;
+}
+
+function statsHTML(){
+  const items = visible();
+  const open = items.filter(i=>!i.done);
+  const over = open.filter(i=>i.date && daysUntil(i.date)<0).length;
+  const soon = open.filter(i=>i.date && daysUntil(i.date)>=0 && daysUntil(i.date)<=7).length;
+  const nodate = open.filter(i=>!i.date && HOT.has(i.type)).length;
+  return `<div class="stats">
+    <div class="stat ${over?"bad":""}"><b>${over}</b><span>Overdue</span></div>
+    <div class="stat"><b>${soon}</b><span>Due in 7 days</span></div>
+    <div class="stat"><b>${nodate}</b><span>Need a date</span></div>
+  </div>`;
+}
+
+function renderWeeks(){
+  const items = visible();
+  const cw = currentWeek();
+  const weeks = [...new Set(items.map(i=>i.week||0))].sort((a,b)=>a-b);
+  let h = "";
+  if(!S.start) h += `<div class="banner">Set the date Week 1 starts so every week shows its dates and “this week” is highlighted.<br><button data-act="settings">Set semester start</button></div>`;
+  for(const w of weeks){
+    const list = items.filter(i=>(i.week||0)===w).sort(cmpItems);
+    const isNow = cw===w;
+    const left = list.filter(i=>!i.done).length;
+    h += `<div class="group ${isNow?"now":""}" id="${isNow?"nowweek":""}">
+      <h2>${w?"Week "+w:"No week"}${isNow?" · this week":""}</h2>
+      <small>${weekRange(w)}${weekRange(w)?" · ":""}${left} left</small></div>`;
+    h += list.map(i=>itemHTML(i,{hideWeek:true})).join("");
+  }
+  return h;
+}
+
+function renderSubjects(){
+  const items = visible();
+  let h = "";
+  for(const s of subjects().filter(s=>S.filter==="all"||S.filter===s)){
+    const list = items.filter(i=>i.subject===s).sort((a,b)=>(a.week||99)-(b.week||99)||cmpItems(a,b));
+    const left = list.filter(i=>!i.done).length;
+    h += `<div class="group"><h2 style="color:${colorFor(s)}">${esc(s)}</h2><small>${left} left of ${list.length}</small></div>`;
+    h += list.map(i=>itemHTML(i,{hideSubject:true})).join("");
+  }
+  return h;
+}
+
+function renderDates(){
+  const items = visible();
+  const open = items.filter(i=>!i.done);
+  const dated = open.filter(i=>i.date).sort(cmpItems);
+  const over = dated.filter(i=>daysUntil(i.date)<0);
+  const up = dated.filter(i=>daysUntil(i.date)>=0);
+  const undated = open.filter(i=>!i.date).sort((a,b)=>(a.week||99)-(b.week||99)||cmpItems(a,b));
+  const done = items.filter(i=>i.done).sort(cmpItems).reverse();
+  let h = "";
+  if(over.length) h += `<div class="group bad"><h2>Overdue</h2><small>${over.length}</small></div>`+over.map(i=>itemHTML(i)).join("");
+  // upcoming grouped by date
+  let last="";
+  for(const i of up){
+    if(i.date!==last){
+      const n=daysUntil(i.date);
+      h += `<div class="group ${n===0?"now":""}"><h2>${n===0?"Today":n===1?"Tomorrow":fmtLong(pd(i.date))}</h2></div>`;
+      last=i.date;
+    }
+    h += itemHTML(i);
+  }
+  if(undated.length) h += `<div class="group"><h2>No date yet</h2><small>${undated.length} · tap + Set date when the lecturer announces it</small></div>`+undated.map(i=>itemHTML(i)).join("");
+  if(done.length) h += `<div class="group"><h2>Done</h2><small>${done.length}</small></div>`+done.map(i=>itemHTML(i)).join("");
+  return h;
+}
+
+function render(){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.v===S.view));
+  const cw = currentWeek();
+  $("#sub").textContent = S.start
+    ? (cw>0 ? "Week "+cw+" · "+weekRange(cw) : "Starts "+fmt(pd(S.start)))
+    : today().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+  let h;
+  if(!S.items.length){
+    h = `<div class="empty"><b>No plan yet</b>Tap + to add one item, or paste your whole weekly plan at once.
+      <div class="btns" style="justify-content:center"><button class="p" style="max-width:240px" data-act="bulk">Paste my plan</button></div></div>`;
+  } else {
+    h = chipsHTML() + statsHTML() + (S.view==="weeks"?renderWeeks():S.view==="subjects"?renderSubjects():renderDates());
+  }
+  $("#main").innerHTML = h;
+}
+
+/* ---------- sheets ---------- */
+function openSheet(html){ $("#sheet").innerHTML = html; $("#bg").classList.add("open"); }
+function closeSheet(){ $("#bg").classList.remove("open"); }
+
+function editSheet(id, preset={}){
+  const i = id ? S.items.find(x=>x.id===id) : null;
+  const v = i || {title:"",subject:S.filter!=="all"?S.filter:"",type:"lecture",week:currentWeek()||"",date:"",notes:"",...preset};
+  openSheet(`<h3>${i?"Edit item":"Add item"}</h3>
+    <label>Title</label><input id="f_title" value="${esc(v.title)}" placeholder="e.g. Assignment 1 – SPARQL queries">
+    <label>Subject</label><input id="f_subject" list="subs" value="${esc(v.subject)}" placeholder="e.g. TSW6223">
+    <datalist id="subs">${subjects().map(s=>`<option value="${esc(s)}">`).join("")}</datalist>
+    <div class="row">
+      <div><label>Type</label><select id="f_type">${TYPES.map(t=>`<option ${t===v.type?"selected":""}>${t}</option>`).join("")}</select></div>
+      <div><label>Week</label><input id="f_week" type="number" min="1" max="30" inputmode="numeric" value="${v.week||""}"></div>
+    </div>
+    <label>Date <span style="font-weight:400">(leave empty until the lecturer gives it)</span></label>
+    <input id="f_date" type="date" value="${v.date||""}">
+    <label>Notes</label><textarea id="f_notes" style="min-height:70px">${esc(v.notes)}</textarea>
+    <div class="btns">
+      ${i?`<button class="d" id="f_del">Delete</button>`:""}
+      <button class="s" id="f_cancel">Cancel</button>
+      <button class="p" id="f_save">Save</button>
+    </div>`);
+  $("#f_cancel").onclick = closeSheet;
+  if(i) $("#f_del").onclick = ()=>{ if(confirm("Delete this item?")){ S.items=S.items.filter(x=>x.id!==id); save(); closeSheet(); render(); } };
+  $("#f_save").onclick = ()=>{
+    const title = $("#f_title").value.trim(), subject = $("#f_subject").value.trim();
+    if(!title || !subject){ alert("Title and subject are required."); return; }
+    const o = {title, subject, type:$("#f_type").value, week:parseInt($("#f_week").value)||0, date:$("#f_date").value, notes:$("#f_notes").value.trim()};
+    if(i) Object.assign(i,o); else S.items.push({id:uid(),done:false,...o});
+    save(); closeSheet(); render();
+  };
+  setTimeout(()=>{ if(!i) $("#f_title").focus(); },50);
+}
+
+function dateSheet(id){
+  const i = S.items.find(x=>x.id===id);
+  openSheet(`<h3>Set date</h3><div style="margin-bottom:6px"><b>${esc(i.title)}</b><div class="hint">${esc(i.subject)}${i.week?" · Week "+i.week:""}</div></div>
+    <label>Due date</label><input id="d_date" type="date" value="${i.date||""}">
+    <div class="btns"><button class="s" id="d_cancel">Cancel</button><button class="p" id="d_save">Save</button></div>`);
+  $("#d_cancel").onclick = closeSheet;
+  $("#d_save").onclick = ()=>{ i.date=$("#d_date").value; save(); closeSheet(); render(); };
+}
+
+function bulkSheet(){
+  openSheet(`<h3>Paste your plan</h3>
+    <div class="hint" style="margin:0 0 6px">One item per line: <code>week | subject | title</code> or <code>week | subject | type | title</code>. Add a date at the end if you already have it: <code>… | 2026-12-10</code>. The type is guessed from the title if you leave it out.</div>
+<textarea id="b_text" style="min-height:200px" placeholder="1 | TSW6223 | Introduction to Semantic Web&#10;3 | TSW6223 | Assignment 1&#10;4 | TWT6223 | quiz | Quiz 1 – HTML/CSS&#10;7 | TSE6223 | Test 1 | 2026-12-21"></textarea>
+    <div class="btns"><button class="s" id="b_cancel">Cancel</button><button class="p" id="b_save">Add all</button></div>`);
+  $("#b_cancel").onclick = closeSheet;
+  $("#b_save").onclick = ()=>{
+    let n=0, bad=[];
+    for(const line of $("#b_text").value.split("\n")){
+      const l=line.trim(); if(!l) continue;
+      const p=l.split("|").map(x=>x.trim());
+      if(p.length<3){ bad.push(l); continue; }
+      let date=""; if(/^\d{4}-\d{2}-\d{2}$/.test(p[p.length-1])) date=p.pop();
+      const week = parseInt(p[0].replace(/\D/g,""))||0;
+      const subject = p[1];
+      let type, title;
+      if(p.length>=4 && TYPES.includes(p[2].toLowerCase())){ type=p[2].toLowerCase(); title=p.slice(3).join(" | "); }
+      else { title=p.slice(2).join(" | "); type=inferType(title); }
+      if(!subject||!title){ bad.push(l); continue; }
+      S.items.push({id:uid(),done:false,title,subject,type,week,date,notes:""}); n++;
+    }
+    save(); closeSheet(); render();
+    if(bad.length) alert(n+" added. Couldn't read "+bad.length+" line(s):\n\n"+bad.join("\n"));
+  };
+}
+
+function settingsSheet(){
+  openSheet(`<h3>Settings</h3>
+    <label>Week 1 starts on</label><input id="s_start" type="date" value="${S.start||""}">
+    <div class="hint">Used to show each week's dates and highlight the current week.</div>
+    <div class="btns"><button class="s" id="s_cancel">Cancel</button><button class="p" id="s_save">Save</button></div>`);
+  $("#s_cancel").onclick = closeSheet;
+  $("#s_save").onclick = ()=>{ S.start=$("#s_start").value; save(); closeSheet(); render(); };
+}
+
+function menuSheet(){
+  openSheet(`<h3>Menu</h3><div class="menu">
+    <button class="s" data-act="bulk">📋 Paste my plan (add many)</button>
+    <button class="s" data-act="settings">⚙️ Semester start date</button>
+    <button class="s" data-act="export">⬇️ Back up to a file</button>
+    <button class="s" data-act="import">⬆️ Restore from backup</button>
+    ${deferredInstall?`<button class="s" data-act="install">📲 Install on this phone</button>`:""}
+    <button class="s" data-act="clear" style="color:var(--danger)">🗑 Clear all done items</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" hidden>`);
+}
+
+function doExport(){
+  if(window.Android){ Android.exportBackup(JSON.stringify(S,null,2), "study-plan-backup-"+ds(today())+".json"); return; }
+  const blob = new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "study-plan-backup-"+ds(today())+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e=>{
+  const t = e.target.closest("[data-done],[data-setdate],[data-edit],[data-filter],[data-act],.tab");
+  if(!t) return;
+  if(t.classList.contains("tab")){ S.view=t.dataset.v; save(); render(); window.scrollTo(0,0); return; }
+  if(t.dataset.done){ const i=S.items.find(x=>x.id===t.dataset.done); i.done=!i.done; save(); render(); return; }
+  if(t.dataset.setdate){ dateSheet(t.dataset.setdate); return; }
+  if(t.dataset.edit){ editSheet(t.dataset.edit); return; }
+  if(t.dataset.filter){ S.filter=t.dataset.filter; save(); render(); return; }
+  const a = t.dataset.act;
+  if(a==="bulk") bulkSheet();
+  else if(a==="settings") settingsSheet();
+  else if(a==="export"){ doExport(); }
+  else if(a==="import"){ const f=$("#importFile"); f.onchange=()=>{ const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!Array.isArray(d.items)) throw 0; S=d; save(); closeSheet(); render(); }catch(_){ alert("That file isn't a valid backup."); } }; r.readAsText(f.files[0]); }; f.click(); }
+  else if(a==="install"&&deferredInstall){ deferredInstall.prompt(); deferredInstall=null; closeSheet(); }
+  else if(a==="clear"){ const n=S.items.filter(i=>i.done).length; if(n&&confirm("Delete "+n+" completed item(s)?")){ S.items=S.items.filter(i=>!i.done); save(); closeSheet(); render(); } else if(!n) alert("No completed items."); }
+});
+$("#fab").onclick = ()=>editSheet(null);
+$("#menuBtn").onclick = menuSheet;
+$("#bg").addEventListener("click", e=>{ if(e.target.id==="bg") closeSheet(); });
+window.addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); deferredInstall=e; });
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) render(); });
+
+window.__setView = v => { S.view = v; save(); closeSheet(); render(); window.scrollTo(0,0); };
+window.__back = () => { if($("#bg").classList.contains("open")){ closeSheet(); return true; } return false; };
+{ const h = location.hash.slice(1); if(["weeks","subjects","dates"].includes(h)) S.view = h; }
+render();
+if(S.view==="weeks"){ const n=$("#nowweek"); if(n) setTimeout(()=>n.scrollIntoView({block:"start"}),50); }
+if(location.protocol.startsWith("http") && "serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>

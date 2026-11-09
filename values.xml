@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Study Plan</string>
+    <string name="widget_desc">Overdue items, the next 14 days and this week\'s plan</string>
+    <string name="widget_empty">Nothing due soon. Tap to open your plan.</string>
+
+    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#1F3A5F</item>
+        <item name="android:navigationBarColor">#1F3A5F</item>
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+</resources>
